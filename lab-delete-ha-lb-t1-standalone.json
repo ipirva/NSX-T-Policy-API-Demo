@@ -1,0 +1,187 @@
+{
+    "children": [
+        {
+            "LBService": {
+                "connectivity_path": "/infra/tier-1s/T1-Standalone",
+                "enabled": true,
+                "id": "LB-T1-Standalone",
+                "marked_for_delete": false,
+                "parent_path": "/infra/lb-services/LB-T1-Standalone",
+                "path": "/infra/lb-services/LB-T1-Standalone",
+                "relative_path": "LB-T1-Standalone",
+                "resource_type": "LBService",
+                "size": "SMALL"
+            },
+            "marked_for_delete": true,
+            "resource_type": "ChildLBService"
+        },
+        {
+            "LBVirtualServer": {
+                "application_profile_path": "/infra/lb-app-profiles/default-http-lb-app-profile",
+                "children": [],
+                "enabled": true,
+                "id": "VIP4-HTTP",
+                "ip_address": "172.16.10.80",
+                "lb_service_path": "/infra/lb-services/LB-T1-Stadalone",
+                "marked_for_delete": false,
+                "parent_path": "/infra/lb-virtual-servers/VIP4-HTTP",
+                "path": "/infra/lb-virtual-servers/VIP4-HTTP",
+                "pool_path": "/infra/lb-pools/Pool-HTTP",
+                "ports": [
+                    "80"
+                ],
+                "relative_path": "VIP4-HTTP",
+                "resource_type": "LBVirtualServer"
+            },
+            "marked_for_delete": true,
+            "resource_type": "ChildLBVirtualServer"
+        },
+        {
+            "LBPool": {
+                "active_monitor_paths": [
+                    "/infra/lb-monitor-profiles/default-http-lb-monitor"
+                ],
+                "algorithm": "ROUND_ROBIN",
+                "children": [],
+                "id": "Pool-HTTP",
+                "marked_for_delete": false,
+                "member_group": {
+                    "group_path": "/infra/domains/default/groups/LB-WEB",
+                    "ip_revision_filter": "IPV4",
+                    "port": 80
+                },
+                "min_active_members": 1,
+                "parent_path": "/infra/lb-pools/Pool-HTTP",
+                "path": "/infra/lb-pools/Pool-HTTP",
+                "relative_path": "Pool-HTTP",
+                "resource_type": "LBPool",
+                "snat_translation": {
+                    "type": "LBSnatAutoMap"
+                }
+            },
+            "marked_for_delete": true,
+            "resource_type": "ChildLBPool"
+        },
+        {
+            "Domain": {
+                "children": [
+                    {
+                        "Group": {
+                            "children": [],
+                            "expression": [
+                                {
+                                    "key": "Tag",
+                                    "marked_for_delete": false,
+                                    "member_type": "VirtualMachine",
+                                    "operator": "EQUALS",
+                                    "resource_type": "Condition",
+                                    "value": "NONAT|WEB"
+                                }
+                            ],
+                            "id": "LB-WEB",
+                            "marked_for_delete": false,
+                            "parent_path": "/infra/domains/default",
+                            "path": "/infra/domains/default/groups/LB-WEB",
+                            "relative_path": "LB-WEB",
+                            "resource_type": "Group"
+                        },
+                        "marked_for_delete": true,
+                        "resource_type": "ChildGroup"
+                    }
+                ],
+                "id": "default",
+                "marked_for_delete": false,
+                "parent_path": "/infra/domains/default",
+                "path": "/infra/domains/default",
+                "relative_path": "default",
+                "resource_type": "Domain"
+            },
+            "marked_for_delete": false,
+            "resource_type": "ChildDomain"
+        },
+        {
+            "Tier1": {
+                "children": [
+                    {
+                        "LocaleServices": {
+                            "children": [
+                                {
+                                    "Tier1Interface": {
+                                        "children": [],
+                                        "id": "web-seg",
+                                        "marked_for_delete": false,
+                                        "parent_path": "/infra/tier-1s/T1-Standalone/locale-services/default",
+                                        "path": "/infra/tier-1s/T1-Standalone/locale-services/default/interfaces/web-seg",
+                                        "relative_path": "web-seg",
+                                        "resource_type": "Tier1Interface",
+                                        "segment_path": "/infra/segments/web-seg",
+                                        "subnets": [
+                                            {
+                                                "ip_addresses": [
+                                                    "172.16.10.80"
+                                                ],
+                                                "prefix_len": 24
+                                            }
+                                        ]
+                                    },
+                                    "marked_for_delete": true,
+                                    "resource_type": "ChildTier1Interface"
+                                }
+                            ],
+                            "edge_cluster_path": "/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83",
+                            "id": "default",
+                            "marked_for_delete": false,
+                            "parent_path": "/infra/tier-1s/T1-Standalone",
+                            "path": "/infra/tier-1s/T1-Standalone/locale-services/b23cf590-cf7a-11e9-b54b-7d403895e3df",
+                            "preferred_edge_paths": [
+                                "/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83/edge-nodes/e42fe2b8-2eb6-4081-bc1e-80f536ccb9be",
+                                "/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83/edge-nodes/f8971d75-3e28-414b-aff5-ccd588e13864"
+                            ],
+                            "relative_path": "default",
+                            "resource_type": "LocaleServices"
+                        },
+                        "marked_for_delete": true,
+                        "resource_type": "ChildLocaleServices"
+                    },
+                    {
+                        "StaticRoutes": {
+                            "children": [],
+                            "id": "default",
+                            "marked_for_delete": false,
+                            "network": "0.0.0.0/0",
+                            "next_hops": [
+                                {
+                                    "admin_distance": 1,
+                                    "ip_address": "172.16.10.1"
+                                }
+                            ],
+                            "parent_path": "/infra/tier-1s/T1-Standalone",
+                            "path": "/infra/tier-1s/T1-Standalone/static-routes/default",
+                            "relative_path": "default",
+                            "resource_type": "StaticRoutes"
+                        },
+                        "marked_for_delete": true,
+                        "resource_type": "ChildStaticRoutes"
+                    }
+                ],
+                "failover_mode": "PREEMPTIVE",
+                "id": "T1-Standalone",
+                "marked_for_delete": false,
+                "parent_path": "/infra/tier-1s/T1-Standalone",
+                "path": "/infra/tier-1s/T1-Standalone",
+                "relative_path": "T1-Standalone",
+                "resource_type": "Tier1",
+                "route_advertisement_types": [
+                    "TIER1_CONNECTED"
+                ]
+            },
+            "marked_for_delete": true,
+            "resource_type": "ChildTier1"
+        }
+    ],
+    "id": "infra",
+    "marked_for_delete": false,
+    "path": "/infra",
+    "relative_path": "infra",
+    "resource_type": "Infra"
+}
