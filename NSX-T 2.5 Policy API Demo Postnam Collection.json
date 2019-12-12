@@ -1,0 +1,354 @@
+{
+	"info": {
+		"_postman_id": "b52dc5c8-2c15-4084-aaf8-b6917e173a69",
+		"name": "NSX-T 2.5 Policy API Demo",
+		"description": "Postman collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Web LB deployment specifics",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Xxx",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{host}}/policy/api/v1/infra/?filter=Type-((?:LBService|LBVirtualServer|LBPool|Tier1|Domain)).*$ ",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"policy",
+						"api",
+						"v1",
+						"infra",
+						""
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "Type-((?:LBService|LBVirtualServer|LBPool|Tier1|Domain)).*$ "
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get VM Tags",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Xxx",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "https://{{host}}/api/v1/fabric/virtual-machines?display_name=T1-web-sv-03a&included_fields=tags",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"fabric",
+						"virtual-machines"
+					],
+					"query": [
+						{
+							"key": "display_name",
+							"value": "T1-web-sv-03a"
+						},
+						{
+							"key": "included_fields",
+							"value": "tags"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deploy LB Web T1-Std",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Xxx",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"children\": [\r\n        {\r\n            \"LBService\": {\r\n                \"connectivity_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                \"enabled\": true,\r\n                \"id\": \"LB-T1-Standalone\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/lb-services/LB-T1-Standalone\",\r\n                \"path\": \"/infra/lb-services/LB-T1-Standalone\",\r\n                \"relative_path\": \"LB-T1-Standalone\",\r\n                \"resource_type\": \"LBService\",\r\n                \"size\": \"SMALL\"\r\n            },\r\n            \"marked_for_delete\": false,\r\n            \"resource_type\": \"ChildLBService\"\r\n        },\r\n        {\r\n            \"LBVirtualServer\": {\r\n                \"application_profile_path\": \"/infra/lb-app-profiles/default-http-lb-app-profile\",\r\n                \"children\": [],\r\n                \"enabled\": true,\r\n                \"id\": \"VIP4-HTTP\",\r\n                \"ip_address\": \"172.16.10.80\",\r\n                \"lb_service_path\": \"/infra/lb-services/LB-T1-Standalone\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/lb-virtual-servers/VIP4-HTTP\",\r\n                \"path\": \"/infra/lb-virtual-servers/VIP4-HTTP\",\r\n                \"pool_path\": \"/infra/lb-pools/Pool-HTTP\",\r\n                \"ports\": [\r\n                    \"80\"\r\n                ],\r\n                \"relative_path\": \"VIP4-HTTP\",\r\n                \"resource_type\": \"LBVirtualServer\"\r\n            },\r\n            \"marked_for_delete\": false,\r\n            \"resource_type\": \"ChildLBVirtualServer\"\r\n        },\r\n        {\r\n            \"LBPool\": {\r\n                \"active_monitor_paths\": [\r\n                    \"/infra/lb-monitor-profiles/default-http-lb-monitor\"\r\n                ],\r\n                \"algorithm\": \"ROUND_ROBIN\",\r\n                \"children\": [],\r\n                \"id\": \"Pool-HTTP\",\r\n                \"marked_for_delete\": false,\r\n                \"member_group\": {\r\n                    \"group_path\": \"/infra/domains/default/groups/LB-WEB\",\r\n                    \"ip_revision_filter\": \"IPV4\",\r\n                    \"port\": 80\r\n                },\r\n                \"min_active_members\": 1,\r\n                \"parent_path\": \"/infra/lb-pools/Pool-HTTP\",\r\n                \"path\": \"/infra/lb-pools/Pool-HTTP\",\r\n                \"relative_path\": \"Pool-HTTP\",\r\n                \"resource_type\": \"LBPool\",\r\n                \"snat_translation\": {\r\n                    \"type\": \"LBSnatAutoMap\"\r\n                }\r\n            },\r\n            \"marked_for_delete\": false,\r\n            \"resource_type\": \"ChildLBPool\"\r\n        },\r\n        {\r\n            \"Domain\": {\r\n                \"children\": [\r\n                    {\r\n                        \"Group\": {\r\n                            \"children\": [],\r\n                            \"expression\": [\r\n                                {\r\n                                    \"key\": \"Tag\",\r\n                                    \"marked_for_delete\": false,\r\n                                    \"member_type\": \"VirtualMachine\",\r\n                                    \"operator\": \"EQUALS\",\r\n                                    \"resource_type\": \"Condition\",\r\n                                    \"value\": \"NONAT|WEB\"\r\n                                }\r\n                            ],\r\n                            \"id\": \"LB-WEB\",\r\n                            \"marked_for_delete\": false,\r\n                            \"parent_path\": \"/infra/domains/default\",\r\n                            \"path\": \"/infra/domains/default/groups/LB-WEB\",\r\n                            \"relative_path\": \"LB-WEB\",\r\n                            \"resource_type\": \"Group\"\r\n                        },\r\n                        \"marked_for_delete\": false,\r\n                        \"resource_type\": \"ChildGroup\"\r\n                    }\r\n                ],\r\n                \"id\": \"default\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/domains/default\",\r\n                \"path\": \"/infra/domains/default\",\r\n                \"relative_path\": \"default\",\r\n                \"resource_type\": \"Domain\"\r\n            },\r\n            \"marked_for_delete\": false,\r\n            \"resource_type\": \"ChildDomain\"\r\n        },\r\n        {\r\n            \"Tier1\": {\r\n                \"children\": [\r\n                    {\r\n                        \"LocaleServices\": {\r\n                            \"children\": [\r\n                                {\r\n                                    \"Tier1Interface\": {\r\n                                        \"children\": [],\r\n                                        \"id\": \"web-seg\",\r\n                                        \"marked_for_delete\": false,\r\n                                        \"parent_path\": \"/infra/tier-1s/T1-Standalone/locale-services/default\",\r\n                                        \"path\": \"/infra/tier-1s/T1-Standalone/locale-services/default/interfaces/web-seg\",\r\n                                        \"relative_path\": \"web-seg\",\r\n                                        \"resource_type\": \"Tier1Interface\",\r\n                                        \"segment_path\": \"/infra/segments/web-seg\",\r\n                                        \"subnets\": [\r\n                                            {\r\n                                                \"ip_addresses\": [\r\n                                                    \"172.16.10.80\"\r\n                                                ],\r\n                                                \"prefix_len\": 24\r\n                                            }\r\n                                        ]\r\n                                    },\r\n                                    \"marked_for_delete\": false,\r\n                                    \"resource_type\": \"ChildTier1Interface\"\r\n                                }\r\n                            ],\r\n                            \"edge_cluster_path\": \"/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83\",\r\n                            \"id\": \"default\",\r\n                            \"marked_for_delete\": false,\r\n                            \"parent_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                            \"path\": \"/infra/tier-1s/T1-Standalone/locale-services/b23cf590-cf7a-11e9-b54b-7d403895e3df\",\r\n                            \"preferred_edge_paths\": [\r\n                                \"/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83/edge-nodes/e42fe2b8-2eb6-4081-bc1e-80f536ccb9be\",\r\n                                \"/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83/edge-nodes/f8971d75-3e28-414b-aff5-ccd588e13864\"\r\n                            ],\r\n                            \"relative_path\": \"default\",\r\n                            \"resource_type\": \"LocaleServices\"\r\n                        },\r\n                        \"marked_for_delete\": false,\r\n                        \"resource_type\": \"ChildLocaleServices\"\r\n                    },\r\n                    {\r\n                        \"StaticRoutes\": {\r\n                            \"children\": [],\r\n                            \"id\": \"default\",\r\n                            \"marked_for_delete\": false,\r\n                            \"network\": \"0.0.0.0/0\",\r\n                            \"next_hops\": [\r\n                                {\r\n                                    \"admin_distance\": 1,\r\n                                    \"ip_address\": \"172.16.10.1\"\r\n                                }\r\n                            ],\r\n                            \"parent_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                            \"path\": \"/infra/tier-1s/T1-Standalone/static-routes/default\",\r\n                            \"relative_path\": \"default\",\r\n                            \"resource_type\": \"StaticRoutes\"\r\n                        },\r\n                        \"marked_for_delete\": false,\r\n                        \"resource_type\": \"ChildStaticRoutes\"\r\n                    }\r\n                ],\r\n                \"failover_mode\": \"PREEMPTIVE\",\r\n                \"id\": \"T1-Standalone\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                \"path\": \"/infra/tier-1s/T1-Standalone\",\r\n                \"relative_path\": \"T1-Standalone\",\r\n                \"resource_type\": \"Tier1\",\r\n                \"route_advertisement_types\": [\r\n                    \"TIER1_CONNECTED\"\r\n                ]\r\n            },\r\n            \"marked_for_delete\": false,\r\n            \"resource_type\": \"ChildTier1\"\r\n        }\r\n    ],\r\n    \"id\": \"infra\",\r\n    \"marked_for_delete\": false,\r\n    \"path\": \"/infra\",\r\n    \"relative_path\": \"infra\",\r\n    \"resource_type\": \"Infra\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{host}}/policy/api/v1/infra/",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"policy",
+						"api",
+						"v1",
+						"infra",
+						""
+					]
+				},
+				"description": "Deploys a Web LoadBalancer on an HA pair of T1 standalone"
+			},
+			"response": []
+		},
+		{
+			"name": "Tag KVM VM",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Xxx",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"external_id\": \"b7af094a-b264-40b7-af3e-d3b00c8cd360\",\r\n    \"tags\": [\r\n        {\"scope\": \"NONAT\", \"tag\": \"WEB\"}\r\n    ]\r\n}"
+				},
+				"url": {
+					"raw": "https://{{host}}/api/v1/fabric/virtual-machines?action=update_tags",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"fabric",
+						"virtual-machines"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "update_tags"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Clean deployment LB Web T1-Std",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Xxx",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"children\": [\r\n        {\r\n            \"LBService\": {\r\n                \"connectivity_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                \"enabled\": true,\r\n                \"id\": \"LB-T1-Standalone\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/lb-services/LB-T1-Standalone\",\r\n                \"path\": \"/infra/lb-services/LB-T1-Standalone\",\r\n                \"relative_path\": \"LB-T1-Standalone\",\r\n                \"resource_type\": \"LBService\",\r\n                \"size\": \"SMALL\"\r\n            },\r\n            \"marked_for_delete\": true,\r\n            \"resource_type\": \"ChildLBService\"\r\n        },\r\n        {\r\n            \"LBVirtualServer\": {\r\n                \"application_profile_path\": \"/infra/lb-app-profiles/default-http-lb-app-profile\",\r\n                \"children\": [],\r\n                \"enabled\": true,\r\n                \"id\": \"VIP4-HTTP\",\r\n                \"ip_address\": \"172.16.10.80\",\r\n                \"lb_service_path\": \"/infra/lb-services/LB-T1-Stadalone\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/lb-virtual-servers/VIP4-HTTP\",\r\n                \"path\": \"/infra/lb-virtual-servers/VIP4-HTTP\",\r\n                \"pool_path\": \"/infra/lb-pools/Pool-HTTP\",\r\n                \"ports\": [\r\n                    \"80\"\r\n                ],\r\n                \"relative_path\": \"VIP4-HTTP\",\r\n                \"resource_type\": \"LBVirtualServer\"\r\n            },\r\n            \"marked_for_delete\": true,\r\n            \"resource_type\": \"ChildLBVirtualServer\"\r\n        },\r\n        {\r\n            \"LBPool\": {\r\n                \"active_monitor_paths\": [\r\n                    \"/infra/lb-monitor-profiles/default-http-lb-monitor\"\r\n                ],\r\n                \"algorithm\": \"ROUND_ROBIN\",\r\n                \"children\": [],\r\n                \"id\": \"Pool-HTTP\",\r\n                \"marked_for_delete\": false,\r\n                \"member_group\": {\r\n                    \"group_path\": \"/infra/domains/default/groups/LB-WEB\",\r\n                    \"ip_revision_filter\": \"IPV4\",\r\n                    \"port\": 80\r\n                },\r\n                \"min_active_members\": 1,\r\n                \"parent_path\": \"/infra/lb-pools/Pool-HTTP\",\r\n                \"path\": \"/infra/lb-pools/Pool-HTTP\",\r\n                \"relative_path\": \"Pool-HTTP\",\r\n                \"resource_type\": \"LBPool\",\r\n                \"snat_translation\": {\r\n                    \"type\": \"LBSnatAutoMap\"\r\n                }\r\n            },\r\n            \"marked_for_delete\": true,\r\n            \"resource_type\": \"ChildLBPool\"\r\n        },\r\n        {\r\n            \"Domain\": {\r\n                \"children\": [\r\n                    {\r\n                        \"Group\": {\r\n                            \"children\": [],\r\n                            \"expression\": [\r\n                                {\r\n                                    \"key\": \"Tag\",\r\n                                    \"marked_for_delete\": false,\r\n                                    \"member_type\": \"VirtualMachine\",\r\n                                    \"operator\": \"EQUALS\",\r\n                                    \"resource_type\": \"Condition\",\r\n                                    \"value\": \"NONAT|WEB\"\r\n                                }\r\n                            ],\r\n                            \"id\": \"LB-WEB\",\r\n                            \"marked_for_delete\": false,\r\n                            \"parent_path\": \"/infra/domains/default\",\r\n                            \"path\": \"/infra/domains/default/groups/LB-WEB\",\r\n                            \"relative_path\": \"LB-WEB\",\r\n                            \"resource_type\": \"Group\"\r\n                        },\r\n                        \"marked_for_delete\": true,\r\n                        \"resource_type\": \"ChildGroup\"\r\n                    }\r\n                ],\r\n                \"id\": \"default\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/domains/default\",\r\n                \"path\": \"/infra/domains/default\",\r\n                \"relative_path\": \"default\",\r\n                \"resource_type\": \"Domain\"\r\n            },\r\n            \"marked_for_delete\": false,\r\n            \"resource_type\": \"ChildDomain\"\r\n        },\r\n        {\r\n            \"Tier1\": {\r\n                \"children\": [\r\n                    {\r\n                        \"LocaleServices\": {\r\n                            \"children\": [\r\n                                {\r\n                                    \"Tier1Interface\": {\r\n                                        \"children\": [],\r\n                                        \"id\": \"web-seg\",\r\n                                        \"marked_for_delete\": false,\r\n                                        \"parent_path\": \"/infra/tier-1s/T1-Standalone/locale-services/default\",\r\n                                        \"path\": \"/infra/tier-1s/T1-Standalone/locale-services/default/interfaces/web-seg\",\r\n                                        \"relative_path\": \"web-seg\",\r\n                                        \"resource_type\": \"Tier1Interface\",\r\n                                        \"segment_path\": \"/infra/segments/web-seg\",\r\n                                        \"subnets\": [\r\n                                            {\r\n                                                \"ip_addresses\": [\r\n                                                    \"172.16.10.80\"\r\n                                                ],\r\n                                                \"prefix_len\": 24\r\n                                            }\r\n                                        ]\r\n                                    },\r\n                                    \"marked_for_delete\": true,\r\n                                    \"resource_type\": \"ChildTier1Interface\"\r\n                                }\r\n                            ],\r\n                            \"edge_cluster_path\": \"/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83\",\r\n                            \"id\": \"default\",\r\n                            \"marked_for_delete\": false,\r\n                            \"parent_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                            \"path\": \"/infra/tier-1s/T1-Standalone/locale-services/b23cf590-cf7a-11e9-b54b-7d403895e3df\",\r\n                            \"preferred_edge_paths\": [\r\n                                \"/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83/edge-nodes/e42fe2b8-2eb6-4081-bc1e-80f536ccb9be\",\r\n                                \"/infra/sites/default/enforcement-points/default/edge-clusters/aa73d38a-b41b-4e88-bc8e-76c1f9d18a83/edge-nodes/f8971d75-3e28-414b-aff5-ccd588e13864\"\r\n                            ],\r\n                            \"relative_path\": \"default\",\r\n                            \"resource_type\": \"LocaleServices\"\r\n                        },\r\n                        \"marked_for_delete\": true,\r\n                        \"resource_type\": \"ChildLocaleServices\"\r\n                    },\r\n                    {\r\n                        \"StaticRoutes\": {\r\n                            \"children\": [],\r\n                            \"id\": \"default\",\r\n                            \"marked_for_delete\": false,\r\n                            \"network\": \"0.0.0.0/0\",\r\n                            \"next_hops\": [\r\n                                {\r\n                                    \"admin_distance\": 1,\r\n                                    \"ip_address\": \"172.16.10.1\"\r\n                                }\r\n                            ],\r\n                            \"parent_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                            \"path\": \"/infra/tier-1s/T1-Standalone/static-routes/default\",\r\n                            \"relative_path\": \"default\",\r\n                            \"resource_type\": \"StaticRoutes\"\r\n                        },\r\n                        \"marked_for_delete\": true,\r\n                        \"resource_type\": \"ChildStaticRoutes\"\r\n                    }\r\n                ],\r\n                \"failover_mode\": \"PREEMPTIVE\",\r\n                \"id\": \"T1-Standalone\",\r\n                \"marked_for_delete\": false,\r\n                \"parent_path\": \"/infra/tier-1s/T1-Standalone\",\r\n                \"path\": \"/infra/tier-1s/T1-Standalone\",\r\n                \"relative_path\": \"T1-Standalone\",\r\n                \"resource_type\": \"Tier1\",\r\n                \"route_advertisement_types\": [\r\n                    \"TIER1_CONNECTED\"\r\n                ]\r\n            },\r\n            \"marked_for_delete\": true,\r\n            \"resource_type\": \"ChildTier1\"\r\n        }\r\n    ],\r\n    \"id\": \"infra\",\r\n    \"marked_for_delete\": false,\r\n    \"path\": \"/infra\",\r\n    \"relative_path\": \"infra\",\r\n    \"resource_type\": \"Infra\"\r\n}"
+				},
+				"url": {
+					"raw": "https://{{host}}/policy/api/v1/infra/",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"policy",
+						"api",
+						"v1",
+						"infra",
+						""
+					]
+				},
+				"description": "Cleans the Web LB deployment"
+			},
+			"response": []
+		},
+		{
+			"name": "https://{{host}}/policy/api/v1/infra/?filter=Type-",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "Xxx",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://{{host}}/policy/api/v1/infra/?filter=Type-",
+					"protocol": "https",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"policy",
+						"api",
+						"v1",
+						"infra",
+						""
+					],
+					"query": [
+						{
+							"key": "filter",
+							"value": "Type-"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "xxx",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "74160eb4-c529-43da-a2d3-16c12e31fd5d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a021926e-ef96-43bd-b1fe-5fa3f066a55e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "fc56e69b-688b-497d-be5e-f7b1e9f2ceb0",
+			"key": "host",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
