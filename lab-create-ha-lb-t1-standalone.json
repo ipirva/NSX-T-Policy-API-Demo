@@ -21,7 +21,7 @@
                 "children": [],
                 "enabled": true,
                 "id": "VIP4-HTTP",
-                "ip_address": "172.16.10.80",
+                "ip_address": "172.16.10.81",
                 "lb_service_path": "/infra/lb-services/LB-T1-Standalone",
                 "marked_for_delete": false,
                 "parent_path": "/infra/lb-virtual-servers/VIP4-HTTP",
@@ -118,7 +118,7 @@
                                         "subnets": [
                                             {
                                                 "ip_addresses": [
-                                                    "172.16.10.80"
+                                                    "172.16.10.81"
                                                 ],
                                                 "prefix_len": 24
                                             }
